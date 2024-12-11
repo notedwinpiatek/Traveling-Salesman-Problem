@@ -27,12 +27,11 @@ def parse_tsp(file_path, start_line, end_line):
 
 
 
-
 file_path = os.path.join(os.path.dirname(__file__), "files/berlin11_modified.tsp")
 start_line = "NODE_COORD_SECTION\n"
 end_line = "EOF\n"
 
 id_num, x, y = parse_tsp(file_path, start_line, end_line)
-print(id_num)
-print(y)
-print(x)
+print(f"Ordering number: {id_num}")
+print(f"x: {x}")
+print(f"y: {y}")
