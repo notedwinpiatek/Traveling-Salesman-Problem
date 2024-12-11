@@ -1,17 +1,24 @@
 import os
 
-file_path = os.path.join(os.path.dirname(__file__), "files/berlin11_modified.tsp")
 
-def parse_tsp(file_path):
+def parse_tsp(file_path, start_line, end_line):
     order_number = []
     x_cord = []
     y_cord = []
     
+    processing = False
+    
     with open(file_path, "r") as file:
         # print(file.read())
         for line in file:
-            parts = line.strip().split()
-            if len(parts) == 3:
+            if start_line in line:
+                processing = True
+                continue
+            if processing and end_line in line:
+                break
+            
+            if processing:
+                parts = line.strip().split()
                 order_number.append(int(parts[0]))
                 x_cord.append(float(parts[1]))
                 y_cord.append(float(parts[2]))
@@ -21,8 +28,11 @@ def parse_tsp(file_path):
 
 
 
-# parse_tsp(file_path)
-id_num, x, y = parse_tsp(file_path)
+file_path = os.path.join(os.path.dirname(__file__), "files/berlin11_modified.tsp")
+start_line = "NODE_COORD_SECTION\n"
+end_line = "EOF\n"
+
+id_num, x, y = parse_tsp(file_path, start_line, end_line)
 print(id_num)
 print(y)
 print(x)
