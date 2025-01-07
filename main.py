@@ -68,17 +68,34 @@ def greedy(start):
     solution.append(start)
     return solution
     
+def start_population(solution):
+    size = random.randrange(0, len(solution) - 1)   
+    population = random.sample(solution, size)
+    population.append(population[0])
+    return population
+
+def population_info(population):
+    size = len(population)
+    best_score = fitness(population, x, y)
+    greedy_distance = fitness(greedy(population[0]), x, y)
+    path = info(population)
+    
+    print(f"Size: {size}")
+    print(f"Best Score: {best_score}")
+    print(f"Path: {path}")
+    print(f"Greedy: {greedy_distance}")
+    
+
 #executing functions 
 file_path = os.path.join(os.path.dirname(__file__), f"files/{file_name}.tsp")
 id_num, x, y = parse_tsp(file_path)
 random_number = random_solution(id_num)
 greedy_path = greedy(start_point)
+population = start_population(id_num)
 
 
 
 # printing
-print(f"Greedy Path: {info(greedy_path)}")
-# print(random_number)
-# print(greedy_path)
-# print(f"Random Distance: {round(fitness(random_number, x, y), 2)}")
-print(f"Greedy Distance: {round(fitness(greedy_path, x, y), 2)}")
+# print(f"Greedy Path: {info(greedy_path)}")
+# print(f"Greedy Distance: {round(fitness(greedy_path, x, y), 2)}")
+population_info(population)
