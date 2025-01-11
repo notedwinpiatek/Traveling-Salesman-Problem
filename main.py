@@ -4,7 +4,8 @@ import random
 
 # Configuration
 start_city = 2
-tsp_file_name = input("Enter file name: ")
+tsp_file_name = "berlin11"
+# tsp_file_name = input("Enter file name: ")
 
 # Functions
 def parse_tsp(file_path):
@@ -90,7 +91,14 @@ def tournament_selection(population):
     tournament_size = random.randint(1, len(population) - 1)
     selected_paths = random.sample(population, tournament_size)
     selected_paths.append(selected_paths[0])
-    return selected_paths
+    list_of_paths = []
+    for path in selected_paths:
+        new_path = calculate_path_distance(path, x_coords, y_coords)
+        list_of_paths.append(new_path)
+    list_of_paths.sort()
+    shortest_distance = list_of_paths[0]
+    second_shortest_distance = list_of_paths[1]
+    return print(f"Shortest distance: {shortest_distance}\nSecond shortest distance: {second_shortest_distance}")
 
 # Executing Functions
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
@@ -99,4 +107,4 @@ random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
 initial_population = initialize_population(city_ids)
 
-print(display_population_statistics(initial_population))
+tournament_selection(initial_population)
