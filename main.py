@@ -75,7 +75,7 @@ def initialize_population(city_ids):
         population.append(generate_random_path(city_ids))
     return population
 
-def display_population_statistics(population, x_coords, y_coords):
+def display_population_statistics(population):
     population_size = len(population)
     best_path_distance = min(calculate_path_distance(path, x_coords, y_coords) for path in population)
     greedy_path_distance = calculate_path_distance(generate_greedy_path(population[0][0], city_ids, x_coords, y_coords), x_coords, y_coords)
@@ -97,8 +97,6 @@ file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp"
 city_ids, x_coords, y_coords = parse_tsp(file_path)
 random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
-# population = initialize_population(city_ids)
+initial_population = initialize_population(city_ids)
 
-# Printing Results
-# display_population_statistics(population, x_coords, y_coords)
-print(random_path)
+print(display_population_statistics(initial_population))
