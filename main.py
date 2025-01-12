@@ -91,14 +91,14 @@ def tournament_selection(population):
     tournament_size = random.randint(1, len(population) - 1)
     selected_paths = random.sample(population, tournament_size)
     selected_paths.append(selected_paths[0])
-    list_of_paths = []
+    smallest_distance = float('inf')
+    smallest_path = []
     for path in selected_paths:
-        new_path = calculate_path_distance(path, x_coords, y_coords)
-        list_of_paths.append(new_path)
-    list_of_paths.sort()
-    shortest_distance = list_of_paths[0]
-    second_shortest_distance = list_of_paths[1]
-    return print(f"Shortest distance: {shortest_distance}\nSecond shortest distance: {second_shortest_distance}")
+        path_distance = calculate_path_distance(path, x_coords, y_coords)
+        if path_distance < smallest_distance:
+            smallest_distance = path_distance
+            smallest_path = path
+    return smallest_path
 
 # Executing Functions
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
@@ -107,4 +107,4 @@ random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
 initial_population = initialize_population(city_ids)
 
-tournament_selection(initial_population)
+print(tournament_selection(initial_population))
