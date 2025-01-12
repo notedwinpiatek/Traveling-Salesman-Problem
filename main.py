@@ -100,6 +100,33 @@ def tournament_selection(population):
             smallest_path = path
     return smallest_path
 
+import random
+
+def crossover(parent_path):
+    second_parent_path = tournament_selection(initial_population)
+    crossover_point1 = random.randint(0, len(parent_path) - 1)
+    crossover_point2 = random.randint(0, len(second_parent_path) - 1)
+    
+    cross = set()
+    res =[]
+    
+    if crossover_point1 > crossover_point2:
+        crossover_point1, crossover_point2 = crossover_point2, crossover_point1
+    
+    middle_section = parent_path[crossover_point1:crossover_point2]
+    # middle_section_set = set(middle_section)
+    
+    # second_parent_path = [element for element in second_parent_path if element not in middle_section_set]
+    
+    child = second_parent_path[:crossover_point1] + middle_section + second_parent_path[crossover_point2:]
+    
+    for element in child:
+        if element not in cross:
+            res.append(element)
+            cross.add(element)            
+
+    return print(f"P1{parent_path},\nP2{second_parent_path},\nC{child}\nS{cross}\nR{res}")
+
 # Executing Functions
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 city_ids, x_coords, y_coords = parse_tsp(file_path)
@@ -107,4 +134,4 @@ random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
 initial_population = initialize_population(city_ids)
 
-print(tournament_selection(initial_population))
+crossover(tournament_selection(initial_population))
