@@ -100,38 +100,55 @@ def tournament_selection(population):
             smallest_path = path
     return smallest_path
 
-import random
+def crossover(parent1, parent2):
+    
+    child = [None] * len(parent1)  # Ensure child has the same length as parent1
 
-def crossover(parent_path):
-    second_parent_path = tournament_selection(initial_population)
-    crossover_point1 = random.randint(0, len(parent_path) - 1)
-    crossover_point2 = random.randint(0, len(second_parent_path) - 1)
-    
-    cross = set()
-    res =[]
-    
-    if crossover_point1 > crossover_point2:
-        crossover_point1, crossover_point2 = crossover_point2, crossover_point1
-    
-    middle_section = parent_path[crossover_point1:crossover_point2]
-    # middle_section_set = set(middle_section)
-    
-    # second_parent_path = [element for element in second_parent_path if element not in middle_section_set]
-    
-    child = second_parent_path[:crossover_point1] + middle_section + second_parent_path[crossover_point2:]
-    
-    for element in child:
-        if element not in cross:
-            res.append(element)
-            cross.add(element)            
+    parent1 = parent1[:-1]
+    parent2 = parent2[:-1]
 
-    return print(f"P1{parent_path},\nP2{second_parent_path},\nC{child}\nS{cross}\nR{res}")
+    # Random crossover points
+    in_point = random.randint(0, len(parent1) - 1)
+    out_point = random.randint(0, len(parent2) - 1)
 
+    # Ensure valid range
+    if in_point > out_point:
+        in_point, out_point = out_point, in_point
+    while in_point == out_point:
+        in_point = random.randint(0, len(parent1) - 1)
+        out_point = random.randint(0, len(parent2) - 1)
+
+    print(in_point,out_point)
+    # Fill child with a segment from parent1
+    child[in_point:out_point] = parent1[in_point:out_point]
+
+    # Track used values
+    used_values = child[in_point:out_point]
+
+    # Fill remaining None values in child with values from parent2
+    for index in range(len(child)):
+        if child[index] is None:
+            for value in parent2:
+                if value not in used_values:
+                    child[index] = value
+                    used_values.append(value)
+                    break
+
+    # Wrap around
+    child[-1] = child[0]
+    
+    print(parent1)
+    print(parent2)
+    print(child)
+    return child
+
+    
 # Executing Functions
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 city_ids, x_coords, y_coords = parse_tsp(file_path)
 random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
 initial_population = initialize_population(city_ids)
-
-crossover(tournament_selection(initial_population))
+parent1 = tournament_selection(initial_population)
+parent2 = tournament_selection(initial_population)
+crossover(parent1, parent2)
