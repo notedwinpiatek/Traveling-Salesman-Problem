@@ -137,9 +137,7 @@ def crossover(parent1, parent2):
     # Wrap around
     child[-1] = child[0]
     
-    print(parent1)
-    print(parent2)
-    print(child)
+    
     return child
 
     
