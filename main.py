@@ -107,14 +107,14 @@ def crossover(parent1, parent2):
 
     # Random crossover points
     in_point = random.randint(0, len(parent1) - 1)
-    out_point = random.randint(0, len(parent2) - 1)
+    out_point = random.randint(0, len(parent1) - 1)
 
     # Ensure valid range
     if in_point > out_point:
         in_point, out_point = out_point, in_point
     while in_point == out_point:
         in_point = random.randint(0, len(parent1) - 1)
-        out_point = random.randint(0, len(parent2) - 1)
+        out_point = random.randint(0, len(parent1) - 1)
 
     child[in_point:out_point] = parent1[in_point:out_point]
 
@@ -214,9 +214,9 @@ city_ids, x_coords, y_coords = parse_tsp(file_path)
 
 # Control Panel:
 probability = 0.03 
-tournament_size = 6
-population_size = 200
-number_of_epoch =200
+tournament_size = 5
+population_size = 10
+number_of_epoch =50
 
 initial_population = initialize_population(city_ids, population_size)
 # Epoch
