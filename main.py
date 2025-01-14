@@ -2,10 +2,12 @@ import os
 import math
 import random
 
+
 # Configuration
 start_city = 2
-tsp_file_name = "berlin11"
 # tsp_file_name = input("Enter file name: ")
+tsp_file_name = "berlin11" # For testing only
+file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 
 # Functions
 def parse_tsp(file_path):
@@ -70,27 +72,23 @@ def generate_greedy_path(start_city, city_ids, x_coords, y_coords):
     path.append(start_city)
     return path
 
-def initialize_population(city_ids):
+def initialize_population(city_ids, size):
     population = []
-    while len(population) < 100:
+    while len(population) < size:
         population.append(generate_random_path(city_ids))
     return population
 
 def display_population_statistics(population):
     population_size = len(population)
-    best_path_distance = min(calculate_path_distance(path, x_coords, y_coords) for path in population)
-    greedy_path_distance = calculate_path_distance(generate_greedy_path(population[0][0], city_ids, x_coords, y_coords), x_coords, y_coords)
+    best_path_distance = min(calculate_path_distance(path, x_coords, y_coords)for path in population)
     best_path = info(population[0])
 
     print(f"Population Size: {population_size}")
     print(f"Best Path Distance: {best_path_distance:.2f}")
     print(f"Path: {best_path}")
-    # print(f"Greedy Path Distance: {greedy_path_distance:.2f}")
-
-def tournament_selection(population):
-    tournament_size = 3
+    
+def tournament_selection(population, tournament_size):
     selected_paths = random.sample(population, tournament_size)
-    selected_paths.append(selected_paths[0])
     smallest_distance = float('inf')
     smallest_path = []
     for path in selected_paths:
@@ -102,8 +100,8 @@ def tournament_selection(population):
 
 def crossover(parent1, parent2):
     
-    child = [None] * len(parent1)  # Ensure child has the same length as parent1
-
+    child = [None] * len(parent1)  
+    
     parent1 = parent1[:-1]
     parent2 = parent2[:-1]
 
@@ -118,8 +116,6 @@ def crossover(parent1, parent2):
         in_point = random.randint(0, len(parent1) - 1)
         out_point = random.randint(0, len(parent2) - 1)
 
-    # print(in_point,out_point)
-    # Fill child with a segment from parent1
     child[in_point:out_point] = parent1[in_point:out_point]
 
     # Track used values
@@ -145,65 +141,62 @@ def mutation(child, probability):
 
     if random.random() <= probability:
         # Select mutation points
-        in_point = random.randint(0, len(child) - 2)  # Exclude the last element (duplicate of start city)
+        in_point = random.randint(0, len(child) - 2)
         out_point = random.randint(0, len(child) - 2)
 
         # Ensure in_point is less than out_point
         if in_point > out_point:
             in_point, out_point = out_point, in_point
-        while in_point == out_point:  # Avoid no-op mutations
+        while in_point == out_point:
             out_point = random.randint(0, len(child) - 2)
             
         # Reverse the segment
         child[in_point:out_point + 1] = reversed(child[in_point:out_point + 1])
         
         child[-1] = child[0]
-
-    #     mutated_distance = calculate_path_distance(child, x_coords, y_coords)
-    # #     print(f"Distance before mutation: {original_distance:.2f}")
-    # #     print(f"Distance after mutation: {mutated_distance:.2f}")
-    # # else:
-    # #     # print("Mutation did not occur!")
-    # #     # print(f"Distance: {original_distance:.2f}")
-    # #     pass
     return child
 
-
-def epoch(initial_population, probability):
-# create 100 epochs 
+def epoch(initial_population,number_of_epoch, probability, tournament_size):
     epoch_id = 0
     population = initial_population
-# while I dont have 100 epochs 
-    while epoch_id < 100:
+    best_distance = float("inf")
+    
+    while epoch_id < number_of_epoch:
         print(f"\nEpoch {epoch_id}")
+        
+        # Generate a new population
         new_population = []
         while len(new_population) < len(population):
-# create new kid from existing population
-# add to new population
-            new_population.append(mutation(crossover(tournament_selection(population), tournament_selection(population)), probability))
-# when you reach n 
+            parent1 = tournament_selection(population, tournament_size)
+            parent2 = tournament_selection(population, tournament_size)
+            child = mutation(crossover(parent1, parent2), probability)
+            new_population.append(child)
+        
+        # Evaluate and update best distance
+        current_best_distance = min(calculate_path_distance(path, x_coords, y_coords) for path in new_population)
+        if current_best_distance < best_distance:
+            best_distance = current_best_distance
+            print(f"New Best Distance: {best_distance:.2f}")
+        
+        # Update population
+        population = new_population
         epoch_id += 1
-        display_population_statistics(new_population)
-# start new epoch from new population
-    population = new_population
+        
+        # Display statistics
+        display_population_statistics(population)
 
 
 # Executing Functions
-file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 city_ids, x_coords, y_coords = parse_tsp(file_path)
 
-random_path = generate_random_path(city_ids)
-greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
-
 # Population
-initial_population = initialize_population(city_ids)
 
-parent1 = tournament_selection(initial_population)
-parent2 = tournament_selection(initial_population)
-child = crossover(parent1, parent2)
+# Control Panel:
+probability = 0.1 
+tournament_size = 10
+population_size = 50
+number_of_epoch =50
 
-# # Mutation
-probability = 0.03 # 50% chance for mutation
-
+initial_population = initialize_population(city_ids, population_size)
 # Epoch
-epoch(initial_population, probability)
+epoch(initial_population, number_of_epoch, probability, tournament_size)
