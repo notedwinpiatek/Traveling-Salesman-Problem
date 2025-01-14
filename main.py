@@ -49,7 +49,7 @@ def calculate_path_distance(path, x_coords, y_coords):
         total_distance += calculate_distance(x1, y1, x2, y2)
     return total_distance
 
-def format_path(path):
+def info(path):
     return " → ".join([str(city) for city in path])
 
 def generate_greedy_path(start_city, city_ids, x_coords, y_coords):
@@ -80,7 +80,7 @@ def display_population_statistics(population):
     population_size = len(population)
     best_path_distance = min(calculate_path_distance(path, x_coords, y_coords) for path in population)
     greedy_path_distance = calculate_path_distance(generate_greedy_path(population[0][0], city_ids, x_coords, y_coords), x_coords, y_coords)
-    best_path = format_path(population[0])
+    best_path = info(population[0])
 
     print(f"Population Size: {population_size}")
     print(f"Best Path Distance: {best_path_distance}")
@@ -118,7 +118,7 @@ def crossover(parent1, parent2):
         in_point = random.randint(0, len(parent1) - 1)
         out_point = random.randint(0, len(parent2) - 1)
 
-    print(in_point,out_point)
+    # print(in_point,out_point)
     # Fill child with a segment from parent1
     child[in_point:out_point] = parent1[in_point:out_point]
 
@@ -140,13 +140,53 @@ def crossover(parent1, parent2):
     
     return child
 
-    
+def mutation(child, probability):
+    print(f"Original path: {info(child)}")
+    original_distance = calculate_path_distance(child, x_coords, y_coords)
+
+    if random.random() <= probability:
+        # Select mutation points
+        in_point = random.randint(0, len(child) - 2)  # Exclude the last element (duplicate of start city)
+        out_point = random.randint(0, len(child) - 2)
+
+        # Ensure in_point is less than out_point
+        if in_point > out_point:
+            in_point, out_point = out_point, in_point
+        while in_point == out_point:  # Avoid no-op mutations
+            out_point = random.randint(0, len(child) - 2)
+            
+        # Reverse the segment
+        child[in_point:out_point + 1] = reversed(child[in_point:out_point + 1])
+        
+        child[-1] = child[0]
+
+        mutated_distance = calculate_path_distance(child, x_coords, y_coords)
+        print(f"Distance before mutation: {original_distance:.2f}")
+        print(f"Distance after mutation: {mutated_distance:.2f}")
+    else:
+        print("Mutation did not occur!")
+
+    return child
+
+
 # Executing Functions
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 city_ids, x_coords, y_coords = parse_tsp(file_path)
+
 random_path = generate_random_path(city_ids)
 greedy_path = generate_greedy_path(start_city, city_ids, x_coords, y_coords)
+
+# Population
 initial_population = initialize_population(city_ids)
+
 parent1 = tournament_selection(initial_population)
 parent2 = tournament_selection(initial_population)
-crossover(parent1, parent2)
+child = crossover(parent1, parent2)
+
+# Mutation
+probability = 0.5 # 50% chance for mutation
+mutant = mutation(child, probability)
+
+# Distances
+child_distance = calculate_path_distance(child, x_coords, y_coords)
+mutant_distance = calculate_path_distance(mutant, x_coords, y_coords)
