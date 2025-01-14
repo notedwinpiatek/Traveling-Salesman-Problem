@@ -83,12 +83,12 @@ def display_population_statistics(population):
     best_path = info(population[0])
 
     print(f"Population Size: {population_size}")
-    print(f"Best Path Distance: {best_path_distance}")
+    print(f"Best Path Distance: {best_path_distance:.2f}")
     print(f"Path: {best_path}")
-    print(f"Greedy Path Distance: {greedy_path_distance}")
+    # print(f"Greedy Path Distance: {greedy_path_distance:.2f}")
 
 def tournament_selection(population):
-    tournament_size = random.randint(1, len(population) - 1)
+    tournament_size = 3
     selected_paths = random.sample(population, tournament_size)
     selected_paths.append(selected_paths[0])
     smallest_distance = float('inf')
@@ -141,7 +141,6 @@ def crossover(parent1, parent2):
     return child
 
 def mutation(child, probability):
-    print(f"Original path: {info(child)}")
     original_distance = calculate_path_distance(child, x_coords, y_coords)
 
     if random.random() <= probability:
@@ -160,13 +159,33 @@ def mutation(child, probability):
         
         child[-1] = child[0]
 
-        mutated_distance = calculate_path_distance(child, x_coords, y_coords)
-        print(f"Distance before mutation: {original_distance:.2f}")
-        print(f"Distance after mutation: {mutated_distance:.2f}")
-    else:
-        print("Mutation did not occur!")
-
+    #     mutated_distance = calculate_path_distance(child, x_coords, y_coords)
+    # #     print(f"Distance before mutation: {original_distance:.2f}")
+    # #     print(f"Distance after mutation: {mutated_distance:.2f}")
+    # # else:
+    # #     # print("Mutation did not occur!")
+    # #     # print(f"Distance: {original_distance:.2f}")
+    # #     pass
     return child
+
+
+def epoch(initial_population, probability):
+# create 100 epochs 
+    epoch_id = 0
+    population = initial_population
+# while I dont have 100 epochs 
+    while epoch_id < 100:
+        print(f"\nEpoch {epoch_id}")
+        new_population = []
+        while len(new_population) < len(population):
+# create new kid from existing population
+# add to new population
+            new_population.append(mutation(crossover(tournament_selection(population), tournament_selection(population)), probability))
+# when you reach n 
+        epoch_id += 1
+        display_population_statistics(new_population)
+# start new epoch from new population
+    population = new_population
 
 
 # Executing Functions
@@ -183,10 +202,8 @@ parent1 = tournament_selection(initial_population)
 parent2 = tournament_selection(initial_population)
 child = crossover(parent1, parent2)
 
-# Mutation
-probability = 0.5 # 50% chance for mutation
-mutant = mutation(child, probability)
+# # Mutation
+probability = 0.03 # 50% chance for mutation
 
-# Distances
-child_distance = calculate_path_distance(child, x_coords, y_coords)
-mutant_distance = calculate_path_distance(mutant, x_coords, y_coords)
+# Epoch
+epoch(initial_population, probability)
