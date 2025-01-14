@@ -1,12 +1,12 @@
 import os
 import math
 import random
-
+import matplotlib.pyplot as plt
 
 # Configuration
 start_city = 2
 # tsp_file_name = input("Enter file name: ")
-tsp_file_name = "berlin11" # For testing only
+tsp_file_name = "berlin52" # For testing only
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 
 # Functions
@@ -160,6 +160,7 @@ def epoch(initial_population,number_of_epoch, probability, tournament_size):
     epoch_id = 0
     population = initial_population
     best_distance = float("inf")
+    epoch_distances = []
     
     while epoch_id < number_of_epoch:
         print(f"\nEpoch {epoch_id}")
@@ -178,24 +179,44 @@ def epoch(initial_population,number_of_epoch, probability, tournament_size):
             best_distance = current_best_distance
             print(f"New Best Distance: {best_distance:.2f}")
         
+        epoch_distances.append(best_distance)
+        
         # Update population
         population = new_population
         epoch_id += 1
         
+        
         # Display statistics
         display_population_statistics(population)
+    # Chart
+    plot_epoch_results(epoch_distances)
 
+def plot_epoch_results(epoch_distances):
+    """
+    Plots the best path distance over epochs.
 
+    Args:
+        epoch_distances (list): A list of the best path distances for each epoch.
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(epoch_distances, marker='o', linestyle='-', color='red', label='Best Path Distance')
+    plt.title('Evolution of Best Path Distance Over Epochs', fontsize=14)
+    plt.xlabel('Epoch', fontsize=12)
+    plt.ylabel('Best Path Distance', fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(fontsize=12)
+    plt.tight_layout()
+    plt.show()
 # Executing Functions
 city_ids, x_coords, y_coords = parse_tsp(file_path)
 
 # Population
 
 # Control Panel:
-probability = 0.1 
-tournament_size = 10
-population_size = 50
-number_of_epoch =50
+probability = 0.03 
+tournament_size = 6
+population_size = 200
+number_of_epoch =200
 
 initial_population = initialize_population(city_ids, population_size)
 # Epoch
