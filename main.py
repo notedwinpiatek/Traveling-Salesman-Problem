@@ -1,6 +1,7 @@
 import os
 import math
 import random
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Configuration
@@ -81,10 +82,14 @@ def initialize_population(city_ids, size):
 def display_population_statistics(population):
     population_size = len(population)
     best_path_distance = min(calculate_path_distance(path, x_coords, y_coords)for path in population)
+    median_distance = np.median([calculate_path_distance(path, x_coords, y_coords) for path in population])
+    worst_path_distance = max(calculate_path_distance(path, x_coords, y_coords) for path in population)
     best_path = info(population[0])
 
     print(f"Population Size: {population_size}")
     print(f"Best Path Distance: {best_path_distance:.2f}")
+    print(f"Median Path Distance: {median_distance:.2f}")
+    print(f"Worst Path Distance: {worst_path_distance:.2f}")
     print(f"Path: {best_path}")
     
 def tournament_selection(population, tournament_size):
@@ -199,7 +204,7 @@ def plot_epoch_results(epoch_distances):
         epoch_distances (list): A list of the best path distances for each epoch.
     """
     plt.figure(figsize=(10, 6))
-    plt.plot(epoch_distances, marker='o', linestyle='-', color='red', label='Best Path Distance')
+    plt.plot(epoch_distances, marker='', linestyle='-', color='red', label='Best Path Distance')
     plt.title('Evolution of Best Path Distance Over Epochs', fontsize=14)
     plt.xlabel('Epoch', fontsize=12)
     plt.ylabel('Best Path Distance', fontsize=12)
@@ -213,10 +218,10 @@ city_ids, x_coords, y_coords = parse_tsp(file_path)
 # Population
 
 # Control Panel:
-probability = 0.03 
-tournament_size = 5
-population_size = 10
-number_of_epoch =50
+probability = 0.06
+tournament_size = 12
+population_size = 50
+number_of_epoch =25
 
 initial_population = initialize_population(city_ids, population_size)
 # Epoch
