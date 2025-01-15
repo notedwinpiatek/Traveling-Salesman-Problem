@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # Configuration
 start_city = 2
 # tsp_file_name = input("Enter file name: ")
-tsp_file_name = "berlin52" # For testing only
+tsp_file_name = "berlin11" # For testing only
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 
 # Functions
@@ -73,11 +73,19 @@ def generate_greedy_path(start_city, city_ids, x_coords, y_coords):
     path.append(start_city)
     return path
 
-def initialize_population(city_ids, size):
+def initialize_population(city_ids, size, greedy_percentage):
     population = []
+    
     while len(population) < size:
-        population.append(generate_random_path(city_ids))
+        if random.random() < greedy_percentage:
+
+            start_city = random.choice(city_ids)
+            population.append(generate_greedy_path(start_city, city_ids, x_coords, y_coords))
+        else:
+            population.append(generate_random_path(city_ids))
+    
     return population
+
 
 def display_population_statistics(population):
     population_size = len(population)
@@ -142,8 +150,6 @@ def crossover(parent1, parent2):
     return child
 
 def mutation(child, probability):
-    original_distance = calculate_path_distance(child, x_coords, y_coords)
-
     if random.random() <= probability:
         # Select mutation points
         in_point = random.randint(0, len(child) - 2)
@@ -221,8 +227,9 @@ city_ids, x_coords, y_coords = parse_tsp(file_path)
 probability = 0.06
 tournament_size = 12
 population_size = 50
-number_of_epoch =25
+number_of_epoch =100
+greedy_percentage = 0
 
-initial_population = initialize_population(city_ids, population_size)
+initial_population = initialize_population(city_ids, population_size, greedy_percentage)
 # Epoch
 epoch(initial_population, number_of_epoch, probability, tournament_size)
