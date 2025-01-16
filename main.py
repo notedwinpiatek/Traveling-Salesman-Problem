@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 # Configuration
 start_city = 2
-# tsp_file_name = input("Enter file name: ")
-tsp_file_name = "berlin11" # For testing only
+tsp_file_name = input("Enter file name: ")
+# tsp_file_name = "berlin52" # For testing only
 file_path = os.path.join(os.path.dirname(__file__), f"files/{tsp_file_name}.tsp")
 
 # Functions
@@ -96,8 +96,8 @@ def display_population_statistics(population):
 
     print(f"Population Size: {population_size}")
     print(f"Best Path Distance: {best_path_distance:.2f}")
-    print(f"Median Path Distance: {median_distance:.2f}")
     print(f"Worst Path Distance: {worst_path_distance:.2f}")
+    print(f"Median Path Distance: {median_distance:.2f}")
     print(f"Path: {best_path}")
     
 def tournament_selection(population, tournament_size):
@@ -221,15 +221,20 @@ def plot_epoch_results(epoch_distances):
 # Executing Functions
 city_ids, x_coords, y_coords = parse_tsp(file_path)
 
-# Population
-
-# Control Panel:
-probability = 0.06
-tournament_size = 12
-population_size = 50
-number_of_epoch =100
-greedy_percentage = 0
-
-initial_population = initialize_population(city_ids, population_size, greedy_percentage)
-# Epoch
-epoch(initial_population, number_of_epoch, probability, tournament_size)
+def run():
+    population_size = int(input("Specify size of the population: "))
+    tournament_size = int(input("Specify size of the tournament: "))
+    number_of_epoch = int(input("Specify number of epochs: "))
+    probability = int(input("Mutation Probability %: "))
+    greedy_percentage = int(input("Greedy %: "))
+    initial_population = initialize_population(city_ids, population_size, greedy_percentage)
+    
+    if probability > 1:
+        probability = probability / 100
+    
+    if greedy_percentage > 1:
+        greedy_percentage = greedy_percentage / 100
+    
+    epoch(initial_population, number_of_epoch, probability, tournament_size)
+   
+run()
